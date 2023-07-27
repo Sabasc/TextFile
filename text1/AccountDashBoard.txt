@@ -1,0 +1,58 @@
+//////???????AccountdashBoard???????////////
+
+//=============== Date Type Api
+[HttpGet]
+        [Route("api/CommonServices/DateType")]
+        public IHttpActionResult DateType(int OrganizationId, int CompanyId)
+        {
+            object lstReturn = null;
+            try
+            {
+                DataTable dt = new DataTable();
+                dt.Columns.Add("Id");
+                dt.Columns.Add("DateType");
+                dt.Rows.Add(1, "This Day");
+                dt.Rows.Add(2, "This Week");
+                dt.Rows.Add(3, "This Month");
+                dt.Rows.Add(4, "This Year");
+                dt.Rows.Add(5, "Financial Year");
+                if (dt.Rows.Count > 0)
+                {
+                    lstReturn = dt;
+                }
+            }
+            catch (Exception ex)
+            {
+                return Json(new { Status = false, Message = ex.Message, Data = "" });
+            }
+            return Json(new { Status = true, Message = "", Data = new { Result = lstReturn } });
+        }
+//================= Search ==========//
+       [HttpGet]
+        [HttpGet]
+        [Route("api/Dashboard/AccountDashboard")]
+        public IHttpActionResult AccountDashboard(int OrganizationId, int CompanyId, int FinancialYearId, int ActivityId, DateTime? FromDate, DateTime? ToDate)
+        {
+            object lstReturn = null;
+            try
+            {
+                Architecture.Model.ReportsParameters account = new Model.ReportsParameters();
+                account.OrganizationId = OrganizationId;
+                account.CompanyId = CompanyId;
+                account.FinancialYearId = FinancialYearId;
+                account.ActivityId = ActivityId;
+                account.DashboardObjectName = "ExectiveAccountsDashboard";
+                account.FromDate = Conversion.ToDateTime(FromDate);
+                account.ToDate = Conversion.ToDateTime(ToDate);
+                List<Model.SmartApp.Dashboard> lst = Architecture.BLL.Dashboard.AccountsDashboard(account);
+                if (lst.Count > 0)
+                {
+                    lstReturn = lst;
+                }
+            }
+            catch (Exception ex)
+            {
+                return Json(new { Status = false, Message = ex.Message, Data = "" });
+            }
+            return Json(new { Status = true, Message = "", Data = new { Result = lstReturn } });
+        }

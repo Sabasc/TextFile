@@ -1,0 +1,130 @@
+ComboApi
+// Read All Parent Group Accounts (i.e 1st , 2nd or 3rd)
+[HttpGet]
+        [Route("api/ChartofAccount/ReadAllParentGroupAccount")]
+        public IHttpActionResult ReadAllParentGroupAccount(int OrganizationId, int CompanyId, int FinancialYearId,
+            int LanguageId, int Account_Level = 0, int AccountTypeId = 0, int AccountClassId = 0
+            )
+        {
+            object lstReturn = null;
+            try
+            {
+                Model.ReportsParameters obj = new Model.ReportsParameters();
+                obj.OrganizationId = OrganizationId;
+                obj.CompanyId = CompanyId;
+                obj.FinancialYearId = FinancialYearId;
+                obj.LanguageId = LanguageId;
+                obj.Account_Level = Account_Level;
+                obj.AccountTypeId = AccountTypeId;
+                obj.AccouuntClassId = AccountClassId;
+                DataTable dt = Architecture.BLL.Accounts.ChartofAccount.ReadAllAccountgroup(obj);
+                if (dt.Rows.Count > 0)
+                {
+                    lstReturn = dt;
+                }
+            }
+            catch (Exception ex)
+            {
+                return Json(new { Status = false, Message = ex.Message, Data = "" });
+            }
+            return Json(new { Status = true, Message = "", Data = new { Result = lstReturn } });
+            
+        }
+
+
+//History Api 
+// Payables With bill Amount
+        [HttpPost]
+        [Route("api/AccountsReports/PayablesWithLastBillAndPaidAmount")]
+        public IHttpActionResult PayablesWithLastBillAndPaidAmount(Architecture.Model.ReportsParameters obj)
+        {
+            object lstReturn = null;
+            try
+            {
+                DataTable dt = Architecture.BLL.Reports.Accounts.VoucherReports.PayablesWithLastBillAndPaidAmount(obj);
+                if (dt.Rows.Count > 0)
+                {
+                    lstReturn = dt;
+                }
+            }
+            catch (Exception ex)
+            {
+                return Json(new { Status = false, Message = ex.Message, Data = "" });
+            }
+            return Json(new { Status = true, Message = "", Data = new { Result = lstReturn } });
+        }
+
+// Method 
+#region PayablesWithLastBillAndPaidAmount
+        public static DataTable PayablesWithLastBillAndPaidAmount(Architecture.Model.ReportsParameters obj)
+        {
+            DataTable dt = null;
+            try
+            {
+                List<SqlParameter> p = new List<SqlParameter>();
+                p.Add(new SqlParameter { ParameterName = "@OrganizationId", Value = obj.OrganizationId });
+                p.Add(new SqlParameter { ParameterName = "@CompanyId", Value = obj.CompanyId });
+                if (!Architecture.Common.Conversion.CheckDateTimeNull(obj.FromDate))
+                {
+                    p.Add(new SqlParameter { ParameterName = "@FromDate", Value = obj.FromDate });
+                }
+                if (!Architecture.Common.Conversion.CheckDateTimeNull(obj.ToDate))
+                {
+                    p.Add(new SqlParameter { ParameterName = "@ToDate", Value = obj.ToDate });
+                }
+                if (obj.FromDocNo != 0)
+                {
+                    p.Add(new SqlParameter { ParameterName = "@BalanceFrom", Value = obj.FromDocNo });
+                }
+                if (obj.ToDocNo != 0)
+                {
+                    p.Add(new SqlParameter { ParameterName = "@BalanceTo", Value = obj.ToDocNo });
+                }
+                if (obj.AccountId != 0)
+                {
+                    p.Add(new SqlParameter { ParameterName = "@AccountType", Value = obj.AccountId });
+                }
+                if (obj.Status != string.Empty)
+                {
+                    p.Add(new SqlParameter { ParameterName = "@ParentAccountCode", Value = obj.Status });
+                }
+                p.Add(new SqlParameter { ParameterName = "@FinancialYearId", Value = obj.FinancialYearId });
+                if (obj.LanguageId != 0)
+                {
+                    p.Add(new SqlParameter { ParameterName = "@LanguageId", Value = obj.LanguageId });
+                }
+                dt = GenericProvider.GetDataTableProc<Architecture.Model.Accounts.VoucherHead>("Sp_Accounts_PayablesWithLastBillAndPaidAmount_Rpt", p);
+                return dt;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+        #endregion
+
+
+ 		string account = "";
+                string customeGroup = Conversion.ToString(cmbAccount.Text.Trim()) + ",";
+                string authors = customeGroup.ToString();
+                string[] authorsList = authors.Split(',');
+                foreach (string author in authorsList)
+                {
+                    for (int i = 0; i < dtAccount.Rows.Count; i++)
+                    {
+                        if(Conversion.ToString(dtAccount.Rows[i]["AccountTitle"]) == author)
+                        {
+                            account += "," + Conversion.ToString(dtAccount.Rows[i]["AccountCode"]);
+                        }
+                    }                    
+                }
+                Architecture.Model.ReportsParameters vh = new Model.ReportsParameters();
+                vh.OrganizationId = UserAccount.OrganizationId;
+                vh.CompanyId = UserAccount.CompanyId;
+                vh.FinancialYearId =  clsGlobalVariables.ActiveYr.Id;
+                vh.FromDate = fromdate.Value;
+                vh.ToDate = todate.Value;
+                vh.AccountId = 3;
+                vh.FromDocNo = Conversion.ToInt(txtBalanceFrom.Text);
+                vh.ToDocNo =   Conversion.ToInt(txtBalanceTo.Text);
+                vh.Status = account;

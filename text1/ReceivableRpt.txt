@@ -1,0 +1,328 @@
+// Combo Binds Api
+//City Get All Api 
+[HttpGet]
+        [Route("api/City/GetByOrganizationCompanyId")]
+        public IHttpActionResult GetByOrganizationCompanyId(int OrganizationId, int CompanyId)
+        {
+            object lstReturn = null;
+            try
+            {
+                Architecture.Model.City obj = new Model.City();
+                obj.OrganizationId = OrganizationId;
+                obj.CompanyId = CompanyId;
+                DataTable dt = Architecture.BLL.City.GetAll(obj);
+                if (dt.Rows.Count > 0)
+                {
+                    lstReturn = dt;
+                }
+            }
+            catch (Exception ex)
+            {
+                return Json(new { Status = false, Message = ex.Message, Data = "" });
+            }
+            return Json(new { Status = true, Message = "", Data = new { Result = lstReturn } });
+        }
+// Read All Parent Group Accounts (i.e 1st , 2nd or 3rd)
+[HttpGet]
+        [Route("api/ChartofAccount/ReadAllParentGroupAccount")]
+        public IHttpActionResult ReadAllParentGroupAccount(int OrganizationId, int CompanyId, int FinancialYearId,
+            int LanguageId, int Account_Level = 0, int AccountTypeId = 0, int AccountClassId = 0
+            )
+        {
+            object lstReturn = null;
+            try
+            {
+                Model.ReportsParameters obj = new Model.ReportsParameters();
+                obj.OrganizationId = OrganizationId;
+                obj.CompanyId = CompanyId;
+                obj.FinancialYearId = FinancialYearId;
+                obj.LanguageId = LanguageId;
+                obj.Account_Level = Account_Level;
+                obj.AccountTypeId = AccountTypeId;
+                obj.AccouuntClassId = AccountClassId;
+                DataTable dt = Architecture.BLL.Accounts.ChartofAccount.ReadAllAccountgroup(obj);
+                if (dt.Rows.Count > 0)
+                {
+                    lstReturn = dt;
+                }
+            }
+            catch (Exception ex)
+            {
+                return Json(new { Status = false, Message = ex.Message, Data = "" });
+            }
+            return Json(new { Status = true, Message = "", Data = new { Result = lstReturn } });
+            
+        }
+
+// Custom Group Api
+[HttpGet]
+        [Route("api/AcLookUpsController/GetAll")]
+        public IHttpActionResult GetAll(int OrganizationId, int CompanyId)
+        {
+
+            object lstReturn = null;
+            try
+            {
+                Architecture.Model.ReportsParameters obj = new Model.ReportsParameters();
+                obj.OrganizationId = OrganizationId;
+                obj.CompanyId = CompanyId;
+                DataTable dt = Architecture.BLL.Accounts.AcLookUps.GetAll(obj);
+                if (dt.Rows.Count > 0)
+                {
+                    lstReturn = dt;
+                }
+            }
+            catch (Exception ex)
+            {
+                return Json(new { Status = false, Message = ex.Message, Data = "" });
+            }
+            return Json(new { Status = true, Message = "", Data = new { Result = lstReturn } });
+        }
+// Inventory Group ( Customer Group From Inventory Evaluation)
+[HttpGet]
+        [Route("api/CustomerGroup/CustomerGroupFromInventoryStockEvaluation")]
+        public IHttpActionResult CustomerGroupFromInventoryStockEvaluation(int OrganizationId , int CompanyId)
+        {
+            object lstReturn = null;
+            try
+            {
+                Architecture.Model.Inventory.CustomerGroup obj = new Model.Inventory.CustomerGroup();
+                obj.OrganizationId = OrganizationId;
+                obj.CompanyId = CompanyId;
+                DataTable dt = Architecture.BLL.Inventory.CustomerGroup.GetSupplierCustomerGroupFromInventoryStockEvaluation(obj);
+                if (dt.Rows.Count > 0)
+                {
+                    lstReturn = dt;
+                }
+            }
+            catch (Exception ex)
+            {
+                return Json(new { Status = false, Message = ex.Message, Data = "" });
+            }
+            return Json(new { Status = true, Message = "", Data = new { Result = lstReturn } });
+        }
+//History ReceivableReport
+        [HttpPost]
+        [Route("api/AccountsReports/Receivable")]
+        public IHttpActionResult Receivable(Architecture.Model.ReportsParameters obj)
+        {
+            object lstReturn = null;
+            try
+            {
+                DataTable dt = Architecture.BLL.Reports.Accounts.VoucherReports.ReceivablesReport(obj);
+                if (dt.Rows.Count > 0)
+                {
+                    lstReturn = dt;
+                }
+            }
+            catch (Exception ex)
+            {
+                return Json(new { Status = false, Message = ex.Message, Data = "" });
+            }
+            return Json(new { Status = true, Message = "", Data = new { Result = lstReturn } });
+        }
+// Method 
+#region ReceivablesReport
+        public static DataTable ReceivablesReport(Architecture.Model.ReportsParameters obj)
+        {
+            DataTable dt = null;
+            try
+            {
+                List<SqlParameter> p = new List<SqlParameter>();
+                p.Add(new SqlParameter { ParameterName = "@OrganizationId", Value = obj.OrganizationId });
+                p.Add(new SqlParameter { ParameterName = "@CompanyId", Value = obj.CompanyId });
+                p.Add(new SqlParameter { ParameterName = "@FinancialYearId", Value = obj.FinancialYearId });
+                if (!Architecture.Common.Conversion.CheckDateTimeNull(obj.FromDate))
+                {
+                    p.Add(new SqlParameter { ParameterName = "@FromDate", Value = obj.FromDate });
+                }
+                if (!Architecture.Common.Conversion.CheckDateTimeNull(obj.ToDate))
+                {
+                    p.Add(new SqlParameter { ParameterName = "@ToDate", Value = obj.ToDate });
+                }
+                if (obj.FromDocNo != 0)
+                {
+                    p.Add(new SqlParameter { ParameterName = "@BalanceFrom", Value = obj.FromDocNo });
+                }
+                if (obj.ToDocNo != 0)
+                {
+                    p.Add(new SqlParameter { ParameterName = "@BalanceTo", Value = obj.ToDocNo });
+                }
+                if (obj.AccountId != 0)
+                {
+                    p.Add(new SqlParameter { ParameterName = "@AccountType", Value = obj.AccountId });
+                }
+                if (obj.CityId != 0)
+                {
+                    p.Add(new SqlParameter { ParameterName = "@CityId", Value = obj.CityId });
+                }
+                if (obj.Status != string.Empty)
+                {
+                    p.Add(new SqlParameter { ParameterName = "@ParentAccountCode", Value = obj.Status });
+                }
+                if (obj.LanguageId != 0)
+                {
+                    p.Add(new SqlParameter { ParameterName = "@LanguageId", Value = obj.LanguageId });
+                }
+                if (obj.ActionId != 0)
+                {
+                    p.Add(new SqlParameter { ParameterName = "@ShowOnlyTrade", Value = obj.ActionId });
+                }
+                if (obj.CustomGroupId != 0)
+                {
+                    p.Add(new SqlParameter { ParameterName = "@CustomGroupId", Value = obj.CustomGroupId });
+                }
+                if (obj.AccountTypeIds != null && obj.AccountTypeIds != string.Empty)
+                {
+                    p.Add(new SqlParameter { ParameterName = "@CustomerGroupIds", Value = obj.AccountTypeIds });
+                }
+                dt = GenericProvider.GetDataTableProc<Architecture.Model.Accounts.VoucherHead>("Sp_Accounts_Receivables_Rpt", p);
+                return dt;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+        #endregion
+
+		string account = "";
+                string GroupIds = "";
+                if (cmbAccount.Text != null && cmbAccount.Text != string.Empty)
+                {
+                    string customeGroup = Conversion.ToString(cmbAccount.Text.Trim()) + ",";
+                    string authors = customeGroup.ToString();
+                    string[] authorsList = authors.Split(',');
+                    foreach (string author in authorsList)
+                    {
+                        for (int i = 0; i < dtAccount.Rows.Count; i++)
+                        {
+                            if (Conversion.ToString(dtAccount.Rows[i]["AccountTitle"]) == author)
+                            {
+                                account += "," + Conversion.ToString(dtAccount.Rows[i]["AccountCode"]);
+                            }
+                        }
+                    }
+                }
+                if (cmbCustomerGroup.Text != null && cmbCustomerGroup.Text != string.Empty)
+                {
+                    string authors = Conversion.ToString(cmbCustomerGroup.Text.Trim()) + ",";
+                    string[] authorsList = authors.Split(',');
+                    foreach (string author in authorsList)
+                    {
+                        DataRow[] dr = dtGroups.Select("Description='" + Conversion.ToString(author) + "'");
+                        if (dr.Length > 0)
+                        {
+                            GroupIds += Conversion.ToString(dr[0].ItemArray[0]) + ",";
+                        }
+                    }
+                }
+                Architecture.Model.ReportsParameters vh = new Model.ReportsParameters();
+                vh.OrganizationId = UserAccount.OrganizationId;
+                vh.CompanyId = UserAccount.CompanyId;
+                vh.FinancialYearId = clsGlobalVariables.ActiveYr.Id;
+                vh.FromDate = fromdate.Value;
+                vh.ToDate = todate.Value;
+                vh.AccountId = 3;
+                vh.FromDocNo = Conversion.ToInt(txtBalanceFrom.Text);
+                vh.ToDocNo =   Conversion.ToInt(txtBalanceTo.Text);
+                vh.Status = account;
+                vh.AccountTypeIds = Conversion.ToString(GroupIds);
+                vh.CityId = Conversion.ToInt(CmbCityName.Value);
+                vh.CustomGroupId = Conversion.ToInt(CmbCustomGroup.Value);
+                if (ChkShowOnlyTrade.Checked)
+                {
+                    vh.ActionId = 1;
+                }
+
+
+// For Followup Combo
+CoaAllocationAccountTitleByAccountTypeIds(OrganizationId,CompanyId "","2,4,15,11,12,10,20,21");
+  [HttpGet]
+        [Route("api/COAAllocation/GetAccountTitleByAccountTypeIds")]
+        public IHttpActionResult GetAccountTitleByAccountTypeIds(int OrganizationId, int CompanyId, string AccountTypeIds = null, string AccountTypeIdsNot = null)
+        {
+            object lstReturn = null;
+            try
+            {
+                Architecture.Model.ReportsParameters obj = new Model.ReportsParameters();
+                obj.OrganizationId = OrganizationId;
+                obj.CompanyId = CompanyId;
+                obj.AccountTypeIds = AccountTypeIds;
+                obj.AccountTypeIdsNot = AccountTypeIdsNot;
+                DataTable dt = Architecture.BLL.Accounts.COAAllocation.GetAccountTitleByAccountTypeIds(obj);
+                if (dt.Rows.Count > 0)
+                {
+                    lstReturn = dt;
+                }
+            }
+            catch (Exception ex)
+            {
+                return Json(new { Status = false, Message = ex.Message, Data = "" });
+            }
+            return Json(new { Status = true, Message = "", Data = new { Result = lstReturn } });
+        }
+//FollowUp History Api
+[HttpGet]
+        [Route("api/AccountsPayRecFollowUpHistory/GetAll")]
+        public IHttpActionResult GetAll(int OrganizationId, int CompanyId)
+        {
+            object lstReturn = null;
+            try
+            {
+                Architecture.Model.Accounts.AccountsPayRecFollowUpHistory obj = new Model.Accounts.AccountsPayRecFollowUpHistory();
+                obj.OrganizationId = OrganizationId;
+                obj.CompanyId = CompanyId;
+                DataTable dt = Architecture.BLL.Accounts.AccountsPayRecFollowUpHistory.GetAll(obj);
+                if (dt.Rows.Count > 0)
+                {
+                    lstReturn = dt;
+                }
+            }
+            catch (Exception ex)
+            {
+                return Json(new { Status = false, Message = ex.Message, Data = "" });
+            }
+            return Json(new { Status = true, Message = "", Data = new { Result = lstReturn } });
+        }
+// FollowUp Save Api 
+ [HttpPost]
+        [Route("api/AccountsPayRecFollowUpHistory/Save")]
+        public IHttpActionResult Save(Architecture.Model.Accounts.AccountsPayRecFollowUpHistory obj)
+        {
+            object lstReturn = null;
+            try
+            {
+                int dt = Architecture.BLL.Accounts.AccountsPayRecFollowUpHistory.Save(obj);
+                if (dt > 0)
+                {
+                    lstReturn = dt;
+                }
+            }
+            catch (Exception ex)
+            {
+                return Json(new { Status = false, Message = ex.Message, Data = "" });
+            }
+            return Json(new { Status = true, Message = "", Data = new { Result = lstReturn } });
+        }
+public class AccountsPayRecFollowUpHistory
+    {
+        public DateTime CommentsDate { get; set; }
+        public DateTime EntryDate { get; set; }
+        public DateTime FollowupDate { get; set; }
+        public DateTime PromiseDate { get; set; }
+        public int ChartOfAccountId { get; set; }
+        public int CompanyId { get; set; }
+        public int DocumentTypeIdRef { get; set; }
+        public int EntryUser { get; set; }
+        public int Id { get; set; }
+        public int NextFollowupDays { get; set; }
+        public int OrganizationId { get; set; }
+        public string CommentsDetail { get; set; }
+    }
+
+
+
+
+
+

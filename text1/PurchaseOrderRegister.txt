@@ -1,0 +1,145 @@
+// Api Suppleir Against Purchase Order
+[HttpGet]
+        [Route("api/SupplierCustomer/SupplierCustomerAgainstPurchaseOrder")]
+        public IHttpActionResult SupplierCustomerAgainstPurchaseOrder(int OrganizationId, int CompanyId, int DocumentTypeId = 0)
+        {
+            object lstReturn = null;
+            try
+            {
+                Model.ReportsParameters obj = new Model.ReportsParameters();
+                obj.OrganizationId = OrganizationId;
+                obj.CompanyId = CompanyId;
+                obj.DocumentTypeId = DocumentTypeId;
+                DataTable dt = Architecture.BLL.Inventory.SupplierCustomer.SupplierCustomerAgainstPurchaseOrder(obj);
+                if (dt.Rows.Count > 0)
+                {
+                    lstReturn = dt;
+                }
+            }
+            catch (Exception ex)
+            {
+                return Json(new { Status = false, Message = ex.Message, Data = "" });
+            }
+            return Json(new { Status = true, Message = "", Data = new { Result = lstReturn } });
+        }
+
+
+// Api Item Against Purchase Order
+     [HttpGet]
+        [Route("api/Item/ItemsAgainstPurchaseOrder")]
+        public IHttpActionResult ItemsAgainstPurchaseOrder(int OrganizationId, int CompanyId, int DocumentTypeId=0)
+        {
+            object lstReturn = null;
+            try
+            {
+                Model.ReportsParameters obj = new Model.ReportsParameters();
+                obj.OrganizationId = OrganizationId;
+                obj.CompanyId = CompanyId;
+                obj.DocumentTypeId = DocumentTypeId;
+                DataTable dt = Architecture.BLL.Inventory.Item.ItemsAgainstPurchaseOrder(obj);
+                if (dt.Rows.Count > 0)
+                {
+                    lstReturn = dt;
+                }
+            }
+            catch (Exception ex)
+            {
+                return Json(new { Status = false, Message = ex.Message, Data = "" });
+            }
+            return Json(new { Status = true, Message = "", Data = new { Result = lstReturn } });
+
+        }
+
+// Api Purchase Order History 
+        [HttpPost]
+        [Route("api/InventoryReports/PurchaseOrderHistory")]
+        public IHttpActionResult PurchaseOrderHistory(Architecture.Model.ReportsParameters obj)
+        {
+            object lstReturn = null;
+            try
+            {
+                DataTable dt = Architecture.BLL.Inventory.PurchaseOrder.PurchaseOrderHistory(obj);
+                if (dt.Rows.Count > 0)
+                {
+                    lstReturn = dt;
+                }
+            }
+            catch (Exception ex)
+            {
+                return Json(new { Status = false, Message = ex.Message, Data = "" });
+            }
+            return Json(new { Status = true, Message = "", Data = new { Result = lstReturn } });
+        }
+
+
+ // Parameters
+public static DataTable PurchaseOrderHistory(Architecture.Model.ReportsParameters obj)
+        {
+            try
+            {
+                List<SqlParameter> p = new List<SqlParameter>();
+                p.Add(new SqlParameter { ParameterName = "@OrganizationId", Value = obj.OrganizationId });
+                p.Add(new SqlParameter { ParameterName = "@CompanyId", Value = obj.CompanyId });
+                p.Add(new SqlParameter { ParameterName = "@DocumentTypeId", Value = obj.DocumentTypeId });
+                if (obj.OrderId != 0)
+                {
+                    p.Add(new SqlParameter { ParameterName = "@OrderId", Value = obj.OrderId });
+                }
+                if (!Architecture.Common.Conversion.CheckDateTimeNull(obj.FromDate))
+                {
+                    p.Add(new SqlParameter { ParameterName = "@StartOrderDate", Value = obj.FromDate });
+                }
+                if (!Architecture.Common.Conversion.CheckDateTimeNull(obj.ToDate))
+                {
+                    p.Add(new SqlParameter { ParameterName = "@EndOrderDate", Value = obj.ToDate });
+                }
+                if (obj.FromDocNo != 0)
+                {
+                    p.Add(new SqlParameter { ParameterName = "@PoSrFrom", Value = obj.FromDocNo });
+                }
+                if (obj.ToDocNo != 0)
+                {
+                    p.Add(new SqlParameter { ParameterName = "@PoSrTo", Value = obj.ToDocNo });
+                }
+                if (obj.SupplierCustomerId != 0)
+                {
+                    p.Add(new SqlParameter { ParameterName = "@SupplierCustomerId", Value = obj.SupplierCustomerId });
+                }
+                if (obj.ItemId != 0)
+                {
+                    p.Add(new SqlParameter { ParameterName = "@ItemId", Value = obj.ItemId });
+                }
+                if (obj.ApprovedFilter != "All")
+                {
+                    p.Add(new SqlParameter { ParameterName = "@IsApproved", Value = obj.IsApproved });
+                }
+                if (obj.Status != null && obj.Status != string.Empty)
+                {
+                    p.Add(new SqlParameter { ParameterName = "@Status", Value = obj.Status });
+                }
+                if(obj.ReqType == null || obj.ReqType == string.Empty)
+                {
+                    obj.ReqType = "All";
+                    if (obj.ReqType != "All")
+                    {
+                        p.Add(new SqlParameter { ParameterName = "@PostState", Value = obj.ActionTypeId });
+                    }
+                }
+                else
+                {
+                    if (obj.ReqType != "All")
+                    {
+                        p.Add(new SqlParameter { ParameterName = "@PostState", Value = obj.ActionTypeId });
+                    }
+                }
+                DataTable dt = new DataTable();
+                dt = GenericProvider.GetDataTableProc<Architecture.Model.Inventory.PurchaseOrder>("Sp_PurchaseOrder_History_Rpt", p);
+                return dt;
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+

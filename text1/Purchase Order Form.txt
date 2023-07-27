@@ -1,0 +1,368 @@
+
+// Api For Supplier Combo 
+        [HttpGet]
+        [Route("api/SupplierCustomer/GetforComboBinding")]
+        public IHttpActionResult GetforComboBinding(int OrganizationId, int CompanyId)
+        {
+            object lstReturn = null;
+            try
+            {
+                Model.Inventory.SupplierCustomer obj = new Model.Inventory.SupplierCustomer();
+                obj.OrganizationId = OrganizationId;
+                obj.CompanyId = CompanyId;
+                DataTable dt = Architecture.BLL.Inventory.SupplierCustomer.GetforComboBinding(obj);
+                if (dt.Rows.Count > 0)
+                {
+                    lstReturn = dt;
+                }
+            }
+            catch (Exception ex)
+            {
+                return Json(new { Status = false, Message = ex.Message, Data = "" });
+            }
+            return Json(new { Status = true, Message = "", Data = new { Result = lstReturn } });
+        }
+
+Hard Coded Combo
+  [HttpGet]
+        [Route("api/CommonServices/DeliveryTerm")]
+        public IHttpActionResult DeliveryTerm(int OrganizationId, int CompanyId)
+        {
+            object lstReturn = null;
+            try
+            {
+                DataTable dt = new DataTable();
+                dt.Columns.Add("Id");
+                dt.Columns.Add("DeliveryTerm");
+                dt.Rows.Add(1, "Load");
+                dt.Rows.Add(2, "Ponch");
+                //dt.Rows.Add(3, "Load & PartyWeight");
+                //dt.Rows.Add(4, "Load & FactoryWeight");
+                //dt.Rows.Add(5, "Ponch & PartyWeight");
+                //dt.Rows.Add(6, "Ponch & FactoryWeight");
+                if (dt.Rows.Count > 0)
+                {
+                    lstReturn = dt;
+                }
+            }
+            catch (Exception ex)
+            {
+                return Json(new { Status = false, Message = ex.Message, Data = "" });
+            }
+            return Json(new { Status = true, Message = "", Data = new { Result = lstReturn } });
+        }
+
+        [HttpGet]
+        [Route("api/CommonServices/OrderStatus")]
+        public IHttpActionResult OrderStatus(int OrganizationId, int CompanyId)
+        {
+            object lstReturn = null;
+            try
+            {
+                DataTable dt = new DataTable();
+                dt.Columns.Add("Id");
+                dt.Columns.Add("Status");
+                dt.Rows.Add(1, "Open");
+                dt.Rows.Add(2, "Complete");
+                dt.Rows.Add(3, "Cancel");
+                if (dt.Rows.Count > 0)
+                {
+                    lstReturn = dt;
+                }
+            }
+            catch (Exception ex)
+            {
+                return Json(new { Status = false, Message = ex.Message, Data = "" });
+            }
+            return Json(new { Status = true, Message = "", Data = new { Result = lstReturn } });
+        }
+
+        [HttpGet]
+        [Route("api/CommonServices/ApprovedStatus")]
+        public IHttpActionResult ApprovedStatus(int OrganizationId, int CompanyId)
+        {
+            object lstReturn = null;
+            try
+            {
+                DataTable dt = new DataTable();
+                dt.Columns.Add("Id");
+                dt.Columns.Add("Status");
+                dt.Rows.Add(1, "Approved");
+                dt.Rows.Add(2, "Not Approved");
+                dt.Rows.Add(3, "All");
+                if (dt.Rows.Count > 0)
+                {
+                    lstReturn = dt;
+                }
+            }
+            catch (Exception ex)
+            {
+                return Json(new { Status = false, Message = ex.Message, Data = "" });
+            }
+            return Json(new { Status = true, Message = "", Data = new { Result = lstReturn } });
+        }
+
+// Payment Term Api
+   [HttpGet]
+        [Route("api/InvDueTerms/GetByOrganizationCompanyId")]
+        public IHttpActionResult GetAll(int OrganizationId, int CompanyId)
+        {
+            object lstReturn = null;
+            try
+            {
+                Model.Inventory.InvDueTerms obj = new Model.Inventory.InvDueTerms();
+                obj.OrganizationId = OrganizationId;
+                obj.CompanyId = CompanyId;
+                DataTable dt = Architecture.BLL.Inventory.InvDueTerms.GetAll(obj);
+                if (dt.Rows.Count > 0)
+                {
+                    lstReturn = dt;
+                }
+            }
+            catch (Exception ex)
+            {
+                return Json(new { Status = false, Message = ex.Message, Data = "" });
+            }
+            return Json(new { Status = true, Message = "", Data = new { Result = lstReturn } });
+        }
+
+// Code Generate Api 
+ [HttpGet]
+        [Route("api/PurchaseOrder/GeneratePurchaseOrderCodeByDocId")]
+        public IHttpActionResult GenerateCode(int OrganizationId, int CompanyId, int DocumentTypeId, int FinancialYearId, int BranchesId)
+        {
+            object lstReturn = null;
+            try
+            {
+                Model.ReportsParameters obj = new Model.ReportsParameters();
+                obj.OrganizationId = OrganizationId;
+                obj.CompanyId = CompanyId;
+                obj.DocumentTypeId = DocumentTypeId;
+                obj.FinancialYearId = FinancialYearId;
+                obj.BranchesId = BranchesId;
+                int Id = Architecture.BLL.Inventory.PurchaseOrder.GenerateCode(obj);
+                if (Id != 0)
+                {
+                    lstReturn = Id;
+                }
+            }
+            catch (Exception ex)
+            {
+                return Json(new { Status = false, Message = ex.Message, Data = "" });
+            }
+            return Json(new { Status = true, Message = "", Data = new { Result = lstReturn } });
+        }
+// Purchase Order Save
+
+[HttpPost]
+        [Route("api/PurchaseOrder/Save")]
+        public IHttpActionResult Save(Architecture.Model.Inventory.PurchaseOrder obj)
+        {
+            object lstReturn = null;
+            try
+            {
+                int Id = Architecture.BLL.Inventory.PurchaseOrder.Save(obj);
+                if (Id != 0)
+                {
+                    lstReturn = Id;
+                }
+            }
+            catch (Exception ex)
+            {
+                return Json(new { Status = false, Message = ex.Message, Data = "" });
+            }
+            return Json(new { Status = true, Message = "", Data = new { Result = lstReturn } });
+        }
+
+//Get By Id 
+[HttpGet]
+        [Route("api/PurchaseOrder/GetByID")]
+        public IHttpActionResult GetByID(int Id)
+        {
+            object lstReturn = null;
+            try
+            {
+                Architecture.Model.Inventory.PurchaseOrder obj = Architecture.BLL.Inventory.PurchaseOrder.GetByID(Id);
+                if (obj != null)
+                {
+                    lstReturn = obj;
+                }
+            }
+            catch (Exception ex)
+            {
+                return Json(new { Status = false, Message = ex.Message, Data = "" });
+            }
+            return Json(new { Status = true, Message = "", Data = new { Result = lstReturn } });
+        }
+// History APi Model Parameters
+
+                p.Add(new SqlParameter { ParameterName = "@OrganizationId", Value = obj.OrganizationId });
+                p.Add(new SqlParameter { ParameterName = "@CompanyId", Value = obj.CompanyId });
+                p.Add(new SqlParameter { ParameterName = "@DocumentTypeId", Value = obj.DocumentTypeId });
+                p.Add(new SqlParameter { ParameterName = "@BranchesId", Value = obj.BranchesId });
+                p.Add(new SqlParameter { ParameterName = "@CanViewAllRecord", Value = obj.CanViewAllRecord });
+                if (obj.FinancialYearId != 0)
+                {
+                    p.Add(new SqlParameter { ParameterName = "@FinancialYearId", Value = obj.FinancialYearId });
+                }
+                if (obj.CanViewAllRecord == false)
+                {
+                    p.Add(new SqlParameter { ParameterName = "@EntryUser", Value = obj.EntryUser });
+                }
+                if (obj.NoOfRecords != 0)
+                {
+                    p.Add(new SqlParameter { ParameterName = "@NoOfRecords", Value = obj.NoOfRecords });
+                }
+
+// History Api
+[HttpPost]
+        [Route("api/PurchaseOrder/GetByOrganizationCompanyId")]
+        public IHttpActionResult GetByOrganizationCompanyId(Architecture.Model.ReportsParameters obj)
+        {
+            object lstReturn = null;
+            try
+            {
+                DataTable dt = Architecture.BLL.Inventory.PurchaseOrder.Getall(obj);
+                if (dt.Rows.Count > 0)
+                {
+                    lstReturn = dt;
+                }
+            }
+            catch (Exception ex)
+            {
+                return Json(new { Status = false, Message = ex.Message, Data = "" });
+            }
+            return Json(new { Status = true, Message = "", Data = new { Result = lstReturn } });
+        }
+
+
+// Item Combo Api 
+[HttpGet]
+        [Route("api/Item/ItemsWithBaseUOM")]
+        public IHttpActionResult ItemsWithBaseUOM(int OrganizationId , int CompanyId)
+        {
+            object lstReturn = null;
+            try
+            {
+                Model.Inventory.Item obj = new Model.Inventory.Item();
+                obj.OrganizationId = OrganizationId;
+                obj.CompanyId = CompanyId;
+                DataTable dt = Architecture.BLL.Inventory.Item.ItemsWithBaseUOM(obj);
+                if (dt.Rows.Count > 0)
+                {
+                    lstReturn = dt;
+                }
+            }
+            catch (Exception ex)
+            {
+                return Json(new { Status = false, Message = ex.Message, Data = "" });
+            }
+            return Json(new { Status = true, Message = "", Data = new { Result = lstReturn } });
+
+        }
+
+// Job Lot Api
+     [HttpGet]
+        [Route("api/JobLot/GetByOrganizationCompanyId")]
+        public IHttpActionResult GetByOrganizationCompanyId(int OrganizationId, int CompanyId)
+        {
+            object lstReturn = null;
+            try
+            {
+                Model.Inventory.JobLot obj = new Model.Inventory.JobLot();
+                obj.OrganizationId = OrganizationId;
+                obj.CompanyId = CompanyId;
+                DataTable dt = Architecture.BLL.Inventory.jobLot.GetAll(obj);
+                if (dt.Rows.Count > 0)
+                {
+                    lstReturn = dt;
+                }
+            }
+            catch (Exception ex)
+            {
+                return Json(new { Status = false, Message = ex.Message, Data = "" });
+            }
+            return Json(new { Status = true, Message = "", Data = new { Result = lstReturn } });
+        }
+// Uom Bind On Item Leave
+[HttpGet]
+        [Route("api/UOMSchedule/SearchByObject")]
+        public IHttpActionResult SearchByObject(int OrganizationId, int CompanyId,int ItemId)
+        {
+            object lstReturn = null;
+            try
+            {
+                Model.Inventory.UOMSchedule obj = new Model.Inventory.UOMSchedule();
+                obj.OrganizationId = OrganizationId;
+                obj.CompanyId = CompanyId;
+                obj.ItemId = ItemId;
+                DataTable dt = Architecture.BLL.Inventory.UOMSchedule.SearchByObject(obj);
+                if (dt.Rows.Count > 0)
+                {
+                    lstReturn = dt;
+                }
+            }
+            catch (Exception ex)
+            {
+                return Json(new { Status = false, Message = ex.Message, Data = "" });
+            }
+            return Json(new { Status = true, Message = "", Data = new { Result = lstReturn } });
+        }
+
+// Api Slip 203 
+       [HttpGet]
+        [Route("api/PurchaseOrder/PurchaseOrderSlipReport203")]
+        public IHttpActionResult PurchaseOrderSlipReport203(int OrganizationId,int CompanyId,int DocumentTypeId, int OrderId)
+        {
+            object lstReturn = null;
+            try
+            {
+                Model.ReportsParameters obj = new Model.ReportsParameters();
+                obj.OrganizationId = OrganizationId;
+                obj.CompanyId = CompanyId;
+                obj.OrderId = OrderId;
+                obj.DocumentTypeId = DocumentTypeId;
+                obj.ApprovedFilter = "All";
+                DataTable dt = Architecture.BLL.Reports.Inventory.PurchaseOrderReports.PurchaseOrderSlipReport203(obj);
+                if (dt.Rows.Count > 0)
+                {
+                    lstReturn = dt;
+                }
+            }
+            catch (Exception ex)
+            {
+                return Json(new { Status = false, Message = ex.Message, Data = "" });
+            }
+            return Json(new { Status = true, Message = "", Data = new { Result = lstReturn } });
+        }
+
+// Slip Api 203 Crystal Report
+[HttpGet]
+        [Route("api/InventoryHistoryReports/InvRptPurchaseOrderRiceSlip_203")]
+        public IHttpActionResult InvRptPurchaseOrderRiceSlip_203(int OrganizationId, int CompanyId, int DocumentTypeId,
+            int OrderId , string CompanyName,string CompanyAddress,string ReportName)
+        {
+            object lstReturn = null;
+            try
+            {
+                Model.ReportsParameters obj = new Model.ReportsParameters();
+                obj.OrganizationId = OrganizationId;
+                obj.CompanyId = CompanyId;
+                obj.OrderId = OrderId;
+                obj.DocumentTypeId = DocumentTypeId;
+                obj.ApprovedFilter = "All";
+                obj.CompanyName = CompanyName;
+                obj.CompanyAddress = CompanyAddress;
+                obj.ReportName = ReportName;
+                string Path = Architecture.WebHelper.Reports.InventoryHistoryReports.InvRptPurchaseOrderRiceSlip_203(obj);
+                if (Path != string.Empty)
+                {
+                    lstReturn = Path;
+                }
+            }
+            catch (Exception ex)
+            {
+                return Json(new { Status = false, Message = ex.Message, Data = "" });
+            }
+            return Json(new { Status = true, Message = "", Data = new { Result = lstReturn } });
+        }

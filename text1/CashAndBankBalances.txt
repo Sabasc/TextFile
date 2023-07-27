@@ -1,0 +1,182 @@
+//Summary Api
+ //cash And bank Balances Summary Report
+        [HttpPost]
+        [Route("api/AccountsReports/CashandBankBalancesSummery")]
+        public IHttpActionResult CashandBankBalancesSummery(Architecture.Model.ReportsParameters obj)
+        {
+            object lstReturn = null;
+            try
+            {
+                DataTable dt = Architecture.BLL.Reports.Accounts.VoucherReports.CashandBankBalancesSummery(obj);
+                if (dt.Rows.Count > 0)
+                {
+                    lstReturn = dt;
+                }
+            }
+            catch (Exception ex)
+            {
+                return Json(new { Status = false, Message = ex.Message, Data = "" });
+            }
+            return Json(new { Status = true, Message = "", Data = new { Result = lstReturn } });
+        }
+// Method 
+#region CashAndBankBalances
+        public static DataTable CashandBankBalancesSummery(Architecture.Model.ReportsParameters obj)
+        {
+            DataTable dt = null;
+            try
+            {
+
+                List<SqlParameter> p = new List<SqlParameter>();
+                p.Add(new SqlParameter("@OrganizationId", obj.OrganizationId));
+                p.Add(new SqlParameter("@CompanyId", obj.CompanyId));
+                p.Add(new SqlParameter("@FinancialYearId", obj.FinancialYearId));
+                p.Add(new SqlParameter("@AccountTypeId", obj.AccountTypeId)); // 15 For Bank and 2 for Cash
+                if (obj.BranchesId != 0)
+                {
+                    p.Add(new SqlParameter("@BranchesId", obj.BranchesId));
+                }
+                if (obj.ProjectsId != 0)
+                {
+                    p.Add(new SqlParameter("@ProjectsId", obj.ProjectsId));
+                }
+                if (!Architecture.Common.Conversion.CheckDateTimeNull(obj.FromDate))
+                {
+                    p.Add(new SqlParameter("@FromDate", obj.FromDate));
+                }
+                if (!Architecture.Common.Conversion.CheckDateTimeNull(obj.ToDate))
+                {
+                    p.Add(new SqlParameter("@ToDate", obj.ToDate));
+                }
+                if (obj.ApprovedFilter != "All")
+                {
+                    p.Add(new SqlParameter("@IsApproved", obj.IsApproved));
+                }
+                dt = GenericProvider.GetDataTableProc<Architecture.Model.ReportsParameters>("Sp_Accounts_CashBankBalancesSummery_Rpt", p);
+                return dt;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+// Reciept And Payment History Api
+//CashBalances
+         [HttpGet]
+        [Route("api/AccountsReports/CashBalances")]
+        public IHttpActionResult CashBalances(int OrganizationId, int CompanyId, DateTime? FromDate, DateTime? ToDate, int AccountId = 0)
+        {
+            object lstReturn = null;
+            try
+            {
+                Architecture.Model.ReportsParameters obj = new Model.ReportsParameters();
+                obj.OrganizationId = OrganizationId;
+                obj.CompanyId = CompanyId;
+                obj.FromDate = Conversion.ToDateTime(FromDate);
+                obj.ToDate = Conversion.ToDateTime(ToDate);
+                obj.AccountId = AccountId;
+                DataTable dt = Architecture.BLL.Reports.Accounts.VoucherReports.CashBalances(obj);
+                if (dt.Rows.Count > 0)
+                {
+                    lstReturn = dt;
+                }
+            }
+            catch (Exception ex)
+            {
+                return Json(new { Status = false, Message = ex.Message, Data = "" });
+            }
+            return Json(new { Status = true, Message = "", Data = new { Result = lstReturn } });
+        }
+
+// Method
+#region CashBalances
+        public static DataTable CashBalances(Architecture.Model.ReportsParameters obj)
+        {
+            try
+            {
+                List<SqlParameter> p = new List<SqlParameter>();
+                p.Add(new SqlParameter("@OrganizationId", obj.OrganizationId));
+                p.Add(new SqlParameter("@CompanyId", obj.CompanyId));
+                if (!Conversion.CheckDateTimeNull(obj.FromDate))
+                {
+                    p.Add(new SqlParameter("@FromDate", obj.FromDate));
+                }
+                if (!Conversion.CheckDateTimeNull(obj.ToDate))
+                {
+                    p.Add(new SqlParameter("@ToDate", obj.ToDate));
+                }
+                if (obj.AccountId > 0)
+                {
+                    p.Add(new SqlParameter("@AccountId", obj.AccountId));
+                }
+                DataTable dt = new DataTable();
+                dt = GenericProvider.GetDataTableProc<Architecture.Model.ReportsParameters>("Sp_Accounts_CashBalances_Rpt", p);
+                return dt;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+        #endregion
+
+
+// Bank Balances Payment And Receipt Summary
+// Bank Balances
+[HttpGet]
+        [Route("api/AccountsReports/BankBalances")]
+        public IHttpActionResult BankBalances(int OrganizationId, int CompanyId,int FinancialYearId, DateTime? FromDate, DateTime? ToDate, int AccountId = 0)
+        {
+            object lstReturn = null;
+            try
+            {
+                Architecture.Model.ReportsParameters obj = new Model.ReportsParameters();
+                obj.OrganizationId = OrganizationId;
+                obj.CompanyId = CompanyId;
+                obj.FinancialYearId = FinancialYearId;
+                obj.FromDate = Conversion.ToDateTime(FromDate);
+                obj.ToDate = Conversion.ToDateTime(ToDate);
+                obj.AccountId = AccountId;
+                DataTable dt = Architecture.BLL.Reports.Accounts.VoucherReports.BankBalances(obj);
+                if (dt.Rows.Count > 0)
+                {
+                    lstReturn = dt;
+                }
+            }
+            catch (Exception ex)
+            {
+                return Json(new { Status = false, Message = ex.Message, Data = "" });
+            }
+            return Json(new { Status = true, Message = "", Data = new { Result = lstReturn } });
+        }
+
+//Method
+       public static DataTable BankBalances(Architecture.Model.ReportsParameters obj)
+        {
+            try
+            {
+                List<SqlParameter> p = new List<SqlParameter>();
+                p.Add(new SqlParameter("@OrganizationId", obj.OrganizationId));
+                p.Add(new SqlParameter("@CompanyId", obj.CompanyId));
+                p.Add(new SqlParameter("@FinancialYearId", obj.FinancialYearId));
+                if (!Conversion.CheckDateTimeNull(obj.FromDate))
+                {
+                    p.Add(new SqlParameter("@FromDate", obj.FromDate));
+                }
+                if (!Conversion.CheckDateTimeNull(obj.ToDate))
+                {
+                    p.Add(new SqlParameter("@ToDate", obj.ToDate));
+                }
+                if (obj.AccountTypeId != 0)
+                {
+                    p.Add(new SqlParameter("@AccountTypeId", obj.AccountTypeId));
+                }
+                DataTable dt = new DataTable();
+                dt = GenericProvider.GetDataTableProc<Architecture.Model.ReportsParameters>("Sp_Accounts_BankBalances_Rpt", p);
+                return dt;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
